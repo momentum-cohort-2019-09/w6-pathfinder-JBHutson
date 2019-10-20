@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 pillow = "*"
 numpy = "*"
+numba = "*"
+pipenv = "*"
 
 [dev-packages]
 yapf = "*"

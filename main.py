@@ -12,7 +12,7 @@ class Map:
         self.diff_between_low_high = ''
 
     def set_map_array(self):
-        with open('elevation_small.txt') as file:
+        with open('elevation_large.txt') as file:
             self.map_array = np.loadtxt(file, dtype=int)
 
     def set_map_color_array(self):
@@ -53,34 +53,54 @@ class Pathfinder:
 
     # rememeber its y,x not x,y
     def find_path(self):
-        starting_point = [300, 0]
-        y = starting_point[0]
-        x = starting_point[1]
-        while x < 599:
-            point = []
-            NE = abs(self.map.map_array[y-1][x+1] - self.map.map_array[y][x])
-            E = abs(self.map.map_array[y][x+1] - self.map.map_array[y][x])
-            SE = abs(self.map.map_array[y+1][x+1] - self.map.map_array[y][x])
-            lowest_point = min(NE, E, SE)
-            if lowest_point == NE:
-                point.append(y-1)
-                point.append(x+1)
-                self.set_pixel_color(point)
-                y = y - 1
-                x = x + 1
-            elif lowest_point == E:
-                point.append(y)
-                point.append(x+1)
-                self.set_pixel_color(point)
-                y = y
-                x = x + 1
-            else:
-                point.append(y+1)
-                point.append(x+1)
-                self.set_pixel_color(point)
-                y = y + 1
-                x = x + 1
-            print(point)
+        path_dict = {}
+        init_y = 0
+        while init_y < len(self.map.map_array) - 1:
+            tot_delta = 0
+            y = init_y
+            x = 0
+            while x < len(self.map.map_array) - 1:
+                point = []
+                NE = None
+                E = None
+                SE = None
+                if y == 0:
+                    E = abs(self.map.map_array[y][x+1] - self.map.map_array[y][x])
+                    SE = abs(self.map.map_array[y+1][x+1] - self.map.map_array[y][x])
+                    lowest_point = min(E, SE)
+                elif y == len(self.map.map_array) - 1:
+                    NE = abs(self.map.map_array[y-1][x+1] - self.map.map_array[y][x])
+                    E = abs(self.map.map_array[y][x+1] - self.map.map_array[y][x])
+                    lowest_point = min(NE, E)
+                else:
+                    NE = abs(self.map.map_array[y-1][x+1] - self.map.map_array[y][x])
+                    E = abs(self.map.map_array[y][x+1] - self.map.map_array[y][x])
+                    SE = abs(self.map.map_array[y+1][x+1] - self.map.map_array[y][x])
+                    lowest_point = min(NE, E, SE)
+
+                if lowest_point == NE and NE != None:
+                    point.append(y-1)
+                    point.append(x+1)
+                    tot_delta += NE
+                    self.set_pixel_color(point)
+                    y = y - 1
+                    x = x + 1
+                elif lowest_point == E and E != None:
+                    point.append(y)
+                    point.append(x+1)
+                    tot_delta += E
+                    self.set_pixel_color(point)
+                    y = y
+                    x = x + 1
+                elif lowest_point == SE and SE != None:
+                    point.append(y+1)
+                    point.append(x+1)
+                    tot_delta += SE
+                    self.set_pixel_color(point)
+                    y = y + 1
+                    x = x + 1
+            path_dict[init_y] = tot_delta
+            init_y += 1
 
 
 
